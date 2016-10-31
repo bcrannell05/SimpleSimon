@@ -56,7 +56,7 @@
         score: 0,
         active: false,
         handler: false,
-        shape: '.shape',
+        shape: ".shape",
         genSequence: [],
         plaSequence: [],
 
@@ -203,12 +203,12 @@
 
         displayLevel: function(){
 
-            $('.level h2').text('Level: '+this.level);
+            $('.level h2').text("Level: "+this.level);
 
         },
 
         displayScore: function(){
-            $('.score h2').text('Score: '+this.score);
+            $('.score h2').text("Score: "+this.score);
         },
 
         keepScore: function(){
@@ -261,7 +261,7 @@
     };
     $(document).ready(function(){
 
-        $(".start").on('mouseup', function(){
+        $(".start").on("mouseup", function(){
             $(this).hide();
             game.difficulty = $('input[name=difficulty]:checked').val();
             $(".difficulty").hide();
