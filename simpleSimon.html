@@ -4,8 +4,86 @@
     <meta charset="UTF-8">
     <title>Simple Simon</title>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+<style>
+    body {
+        background-color: black;
+        color: #fff;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0 0 5px 0;
+        padding: 0;
+        text-align: center;
+    }
+
+    li {
+        display: inline-block;
+        padding: 3px;
+    }
+
+    .wrapper {
+        position: relative;
+        width: 640px;
+        margin: 0 auto;
+    }
+
+    .pad {
+        width: 300px;
+        height: 300px;
+        float: left;
+        z-index: 1;
+        margin: 10px;
+        filter: alpha(opacity=60);
+        opacity: 0.6;
+    }
+
+    .shape1 {
+        border-top-left-radius: 300px;
+        background-color: green;
+    }
+
+    .shape2 {
+        float: left;
+        border-top-right-radius: 300px;
+        background-color: red;
+        clear: right;
+    }
+
+    .shape3 {
+        float: left;
+        border-bottom-left-radius: 300px;
+        background-color: yellow;
+        clear: left;
+    }
+
+    .shape4 {
+        float: left;
+        border-bottom-right-radius: 300px;
+        background-color: blue;
+    }
+
+    .level, .score {
+        width: 50%;
+        float: left;
+        height:50px;
+        text-align: center;
+    }
+
+    .sButton {
+        width: 30%;
+        margin: 0 auto;
+    }
+
+    .start {
+        width: 100%;
+        height: 30px;
+        text-align: center;
+    }
+</style>
 </head>
 <body>
+<audio id="doh" src="Doh 4.mp3"></audio>
 <div class="wrapper">
     <div class="back">
         <div class="pad shape1" data-pad="1">
@@ -29,16 +107,10 @@
         <li>
             <input type="radio" class="modeOpt" name="mode" value="1" checked>Classic
         </li>
-        <li>
-            <input type="radio" class="modeOpt" name="mode" value="0">Non Classic
-        </li>
     </ul>
 
     <ul class="difficulty">
 
-        <li>
-            <input type="radio" class="difOpt" name="difficulty" value="2">Easy
-        </li>
         <li>
             <input type="radio" class="difOpt" name="difficulty" value="1" checked>Normal
         </li>
@@ -59,85 +131,56 @@
         shape: ".shape",
         genSequence: [],
         plaSequence: [],
-
         init: function(){
             if(this.handler === false){
                 this.initPadHandler();
             }
             this.newGame();
-
         },
-
         initPadHandler: function(){
-
             that=this;
-
             $(".pad").on('click',function(){
-
                 if(that.active===true){
-
                     var pad=parseInt($(this).data('pad'),10);
-
                     that.flash($(this),1,300, pad);
-
                     that.logPlayerSequence(pad);
-                    console.log();
-
                 }
             });
-
             this.handler=true;
-
         },
-
         newGame: function(){
-
             this.level=1;
             this.score=0;
             this.newLevel();
             this.displayLevel();
             this.displayScore();
-
         },
-
         newLevel: function(){
-
             this.plaSequence.length=0;
             this.pos=0;
             this.turn=0;
             this.active=true;
-
             if(this.classic !== 1){
-
                 this.genSequence.length=0;
                 this.randomizePad(this.level);
-
             }else if(this.classic ===1 && this.level ===1){
-
                 this.genSequence.length=0;
                 this.randomizePad(50);
             }
-
             if(this.classic ===1 && this.level > 50){
                 this.level = 50;
             }
-
             this.displaySequence();
-
         },
-
         flash: function(element, times, speed, pad){
-
             if(times > 0){
                 element.stop().animate({opacity: '1'}, {
-                    duration: 50,
+                    duration: 70,
                     complete: function(){
                         element.stop().animate({opacity: '0.6'}, 200);
                     }
                 });
-
             }
-
             if (times > 0) {
                 setTimeout(function () {
                     that.flash(element, times, speed, pad);
@@ -145,37 +188,23 @@
                 times -= 1;
             }
         },
-
         randomizePad: function(passes){
-
-            for(i = 0;i<passes;i++){
-
+            for(i = 0; i < passes; i++){
                 this.genSequence.push(Math.floor(Math.random() * 4) + 1);
             }
         },
-
         logPlayerSequence: function(pad){
-
             this.plaSequence.push(pad);
             this.checkSequence();
-
-
         },
-
         checkSequence: function(pad){
-
             if(this.plaSequence[this.turn] !== this.genSequence[this.turn]){
-
                 this.incorrectSequence(pad);
-
             }else{
                 this.keepScore();
                 this.turn++;
-
             }
-
             if(this.turn === this.level){
-
                 this.level++;
                 this.displayLevel();
                 this.active=false;
@@ -184,75 +213,50 @@
                 },1000);
             }
         },
-
         displaySequence: function(){
-
             $.each(this.genSequence, function(index, val) {
-
                 setTimeout(function(){
-
                     that.flash($(that.shape+val),1,300,val);
-
                 },500*index*that.difficulty);
-
                 if(index === that.level-1){
                     return false;
                 }
             });
         },
-
         displayLevel: function(){
-
             $('.level h2').text("Level: "+this.level);
-
         },
-
         displayScore: function(){
             $('.score h2').text("Score: "+this.score);
         },
-
         keepScore: function(){
-
             var multiplier=0;
-
             switch(this.difficulty)
             {
-                case '2':
-                    multiplier=1;
-                    break;
-
                 case '1':
                     multiplier=2;
                     break;
             }
-
             this.score += (1 * multiplier);
-
             this.displayScore();
         },
-
         incorrectSequence: function(){
-
+            var doh = $('#doh')[0];
             var corPad = this.genSequence[this.turn],
-
                     that = this;
             this.active=false;
             this.displayLevel();
             this.displayScore();
-
             setTimeout(function(){
                 that.flash($(that.shape+corPad),4,300,corPad);
             },500);
-
+            $('#doh').get(0).play();
             $(".start").show();
             $(".difficulty").show();
             $(".mode").show();
-
         }
-
     };
     $(document).ready(function(){
-
         $(".start").on("mouseup", function(){
             $(this).hide();
             game.difficulty = $('input[name=difficulty]:checked').val();
